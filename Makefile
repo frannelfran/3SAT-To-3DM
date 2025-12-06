@@ -12,8 +12,8 @@ BIN_DIR = bin
 DOC_DIR = doc
 
 # Archivos fuente y objeto
-SOURCES = $(SRC_DIR)/main.cpp $(SRC_DIR)/Reduccion3SATto3DM.cpp
-OBJECTS = $(BIN_DIR)/main.o $(BIN_DIR)/Reduccion3SATto3DM.o
+SOURCES = $(SRC_DIR)/main.cpp $(SRC_DIR)/Reduccion3SATto3DM.cpp $(SRC_DIR)/Utils.cpp $(SRC_DIR)/UI.cpp $(SRC_DIR)/FormulaHandler.cpp
+OBJECTS = $(BIN_DIR)/main.o $(BIN_DIR)/Reduccion3SATto3DM.o $(BIN_DIR)/Utils.o $(BIN_DIR)/UI.o $(BIN_DIR)/FormulaHandler.o
 
 # Ejecutable
 TARGET = $(BIN_DIR)/3sat-to-3dm
@@ -28,7 +28,7 @@ $(TARGET): $(OBJECTS)
 	@echo "✓ Compilación completada: $(TARGET)"
 
 # Compilar main.cpp
-$(BIN_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/Reduccion3SATto3DM.h $(INCLUDE_DIR)/Clausula.h
+$(BIN_DIR)/main.o: $(SRC_DIR)/main.cpp $(INCLUDE_DIR)/Reduccion3SATto3DM.h $(INCLUDE_DIR)/Utils.h $(INCLUDE_DIR)/UI.h $(INCLUDE_DIR)/FormulaHandler.h
 	@mkdir -p $(BIN_DIR)
 	@echo "Compilando main.cpp..."
 	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)/main.cpp -o $(BIN_DIR)/main.o
@@ -38,6 +38,24 @@ $(BIN_DIR)/Reduccion3SATto3DM.o: $(SRC_DIR)/Reduccion3SATto3DM.cpp $(INCLUDE_DIR
 	@mkdir -p $(BIN_DIR)
 	@echo "Compilando Reduccion3SATto3DM.cpp..."
 	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)/Reduccion3SATto3DM.cpp -o $(BIN_DIR)/Reduccion3SATto3DM.o
+
+# Compilar Utils.cpp
+$(BIN_DIR)/Utils.o: $(SRC_DIR)/Utils.cpp $(INCLUDE_DIR)/Utils.h
+	@mkdir -p $(BIN_DIR)
+	@echo "Compilando Utils.cpp..."
+	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)/Utils.cpp -o $(BIN_DIR)/Utils.o
+
+# Compilar UI.cpp
+$(BIN_DIR)/UI.o: $(SRC_DIR)/UI.cpp $(INCLUDE_DIR)/UI.h $(INCLUDE_DIR)/Utils.h
+	@mkdir -p $(BIN_DIR)
+	@echo "Compilando UI.cpp..."
+	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)/UI.cpp -o $(BIN_DIR)/UI.o
+
+# Compilar FormulaHandler.cpp
+$(BIN_DIR)/FormulaHandler.o: $(SRC_DIR)/FormulaHandler.cpp $(INCLUDE_DIR)/FormulaHandler.h $(INCLUDE_DIR)/Reduccion3SATto3DM.h $(INCLUDE_DIR)/Utils.h
+	@mkdir -p $(BIN_DIR)
+	@echo "Compilando FormulaHandler.cpp..."
+	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)/FormulaHandler.cpp -o $(BIN_DIR)/FormulaHandler.o
 
 # Compilar con símbolos de depuración
 debug: CXXFLAGS += $(DEBUGFLAGS)
