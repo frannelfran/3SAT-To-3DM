@@ -1,0 +1,6 @@
+# Ejemplo Medio
+# (p v q v r) ^ (-p v -q v -r) ^ (p v -q v r)
+3 3
+1 2 3
+-1 -2 -3
+1 -2 3
