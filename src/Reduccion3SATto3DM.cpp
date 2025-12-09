@@ -1,6 +1,14 @@
+/**
+ * @file FormulaHandler.cpp
+ * @brief Implementación del manejo de fórmulas 3SAT
+ * @author Proyecto de Complejidad Computacional
+ * @date 2025
+ */
+
 #include "Reduccion3SATto3DM.h"
 #include <iostream>
 #include <cmath>
+#include <string>
 
 Reduccion3SATto3DM::Reduccion3SATto3DM(int numVars, std::vector<Clausula> f) 
     : n(numVars), formula(f) {
@@ -10,21 +18,21 @@ Reduccion3SATto3DM::Reduccion3SATto3DM(int numVars, std::vector<Clausula> f)
 void Reduccion3SATto3DM::generar() {
     std::cout << "--- Generando Reduccion 3SAT -> 3DM ---\n";
     
-    // 1. Truth-Setting (Configuración de Verdad) [cite: 28]
+    // 1. Truth-Setting (Configuración de Verdad)
     // Se crean componentes para cada variable que fuerzan a elegir True o False.
     generarComponentesVariables();
 
-    // 2. Satisfaction Testing (Comprobación de Satisfacción) [cite: 36]
+    // 2. Satisfaction Testing (Comprobación de Satisfacción)
     // Se crean tripletas para cubrir las cláusulas usando los "tips" libres.
     generarComponentesClausulas();
 
-    // 3. Garbage Collection (Recolección de Basura) [cite: 38, 69]
+    // 3. Garbage Collection (Recolección de Basura)
     // Se añaden elementos para asegurar que sea un matching perfecto.
     generarGarbageCollection();
 }
 
 void Reduccion3SATto3DM::imprimirResultados() const {
-    std::cout << "\n--- Conjunto M (Tripletas) Generado --- [cite: 23]\n";
+    std::cout << "\n--- Conjunto M (Tripletas) Generado ---\n";
     std::cout << "Formato: (W, X, Y)\n";
     for (const auto& t : M) {
         std::cout << "Tipo [" << t.tipo << "]: (" 
@@ -32,17 +40,23 @@ void Reduccion3SATto3DM::imprimirResultados() const {
     }
     std::cout << "\nTotal de Tripletas: " << M.size() << "\n";
     
-    // Cardinalidad esperada para un matching perfecto q = n*m [cite: 31, 82]
-    // Nota: En la reducción completa estándar, el tamaño del matching perfecto suele ser m*n.
+    // Cardinalidad esperada para un matching perfecto q = n*m
+    // En la reducción estándar, el tamaño del matching perfecto es m*n (variables) + m*(n-1) (garbage) ?? 
+    // Corrección teórica: El matching perfecto debe tener tamaño n*m.
+    // n*m (anillos) cubren n*m puntas.
     std::cout << "Matching Perfecto objetivo requiere seleccionar " << m * n << " tripletas.\n"; 
 }
 
 void Reduccion3SATto3DM::generarComponentesVariables() {
-    // [cite: 19-21] Definimos elementos en W, X, Y para cada variable.
+    // Definimos elementos en W, X, Y para cada variable.
     // Por cada variable 'i', generamos un anillo de 'm' etapas.
     
     for (int i = 1; i <= n; ++i) {
-        std::string varName = (i == 1) ? "p" : (i == 2) ? "q" : "r"; // Ejemplo p, q, r
+        // --- CORRECCIÓN DE FRANCO ---
+        // Antes esto fallaba para la 4ta variable (ponía 'r' siempre).
+        // Ahora genera nombres dinámicos: a, b, c, d...
+        char letraVar = 'a' + (i - 1); 
+        std::string varName(1, letraVar); 
         
         // Inicializar vectores de tips para esta variable
         tipsPositivos[i].resize(m);
@@ -50,13 +64,13 @@ void Reduccion3SATto3DM::generarComponentesVariables() {
 
         for (int j = 0; j < m; ++j) {
             // Nombres de nodos internos (X, Y) y externos (W)
-            // Usamos nomenclatura de los apuntes: puntas p1, -p1, etc. [cite: 44-47]
+            // Usamos nomenclatura de los apuntes: puntas p1, -p1, etc.
             
             std::string x_ij = "x_" + varName + "_" + std::to_string(j+1);
             std::string y_ij = "y_" + varName + "_" + std::to_string(j+1);
             
             // Los elementos de W son los "tips" o puntas que conectan con las cláusulas
-            // W consiste en componentes externas [cite: 54]
+            // W consiste en componentes externas
             std::string w_ij  = "w_" + varName + "_" + std::to_string(j+1);     // Punta asociada a literal positivo
             std::string w_bar_ij = "w_neg_" + varName + "_" + std::to_string(j+1); // Punta asociada a literal negativo
 
@@ -66,8 +80,6 @@ void Reduccion3SATto3DM::generarComponentesVariables() {
 
             // Construcción del gadget (anillo):
             // Tripleta TRUE: selecciona la punta negativa para dejar libre la positiva a la cláusula (o viceversa según convención).
-            // Convención estándar: Si elijo TRUE en el anillo, "cubro" la punta que NO es verdadera para que nadie más la use,
-            // dejando la punta VERDADERA disponible para la cláusula.
             
             // Opción A (Variable=True): (w_neg, x_current, y_current)
             M.push_back({w_bar_ij, x_ij, y_ij, "Var-" + varName + "-True"});
@@ -81,7 +93,7 @@ void Reduccion3SATto3DM::generarComponentesVariables() {
 }
 
 void Reduccion3SATto3DM::generarComponentesClausulas() {
-    // [cite: 36, 58] Satisfaction testing
+    // Satisfaction testing
     // Por cada cláusula 'j', creamos tripletas que intentan hacer "match" con los tips libres de las variables.
     
     for (int j = 0; j < m; ++j) {
@@ -108,18 +120,19 @@ void Reduccion3SATto3DM::generarComponentesClausulas() {
 }
 
 void Reduccion3SATto3DM::generarGarbageCollection() {
-    // [cite: 38, 69, 74] Garbage Collection
-    // "Es un conjunto de tripletas añadidas únicamente para asegurar que todos los elementos aparezcan" [cite: 75-76]
-    // Se crean g1, g2 y m*(n-1) tripletas de basura.
+    // Garbage Collection
+    // NOTA SOBRE COMENTARIO DE FRANCO:
+    // El Garbage Collection DEBE conectarse a todos los tips posibles.
+    // Si excluimos los tips de las cláusulas, no podríamos recoger los literales "sobrantes"
+    // en cláusulas con múltiples valores verdaderos.
     
-    int totalGarbage = m * (n - 1); // 
+    int totalGarbage = m * (n - 1); 
     
     for (int k = 1; k <= totalGarbage; ++k) {
         std::string g1 = "g1_" + std::to_string(k);
         std::string g2 = "g2_" + std::to_string(k);
         
-        // La recolección de basura debe poder conectarse a CUALQUIER tip (positivo o negativo)
-        // que no haya sido usado ni por el anillo ni por las cláusulas.
+        // La recolección de basura se conecta a CUALQUIER tip (positivo o negativo)
         for (int i = 1; i <= n; ++i) {
             for (int j = 0; j < m; ++j) {
                 M.push_back({tipsPositivos[i][j], g1, g2, "Garbage"});
