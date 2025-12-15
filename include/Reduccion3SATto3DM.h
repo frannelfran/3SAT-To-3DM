@@ -77,6 +77,12 @@ public:
      * el conjunto M resultante.
      */
     void imprimirResultados() const;
+
+    /**
+     * @brief Obtiene el conjunto de tripletas generado
+     * @return Vector de tripletas
+     */
+    const std::vector<Tripleta>& getTripletas() const { return M; }
 };
 
 #endif // REDUCCION3SATTO3DM_H

@@ -12,8 +12,8 @@ BIN_DIR = bin
 DOC_DIR = doc
 
 # Archivos fuente y objeto
-SOURCES = $(SRC_DIR)/main.cpp $(SRC_DIR)/Reduccion3SATto3DM.cpp $(SRC_DIR)/Utils.cpp $(SRC_DIR)/UI.cpp $(SRC_DIR)/FormulaHandler.cpp
-OBJECTS = $(BIN_DIR)/main.o $(BIN_DIR)/Reduccion3SATto3DM.o $(BIN_DIR)/Utils.o $(BIN_DIR)/UI.o $(BIN_DIR)/FormulaHandler.o
+SOURCES = $(SRC_DIR)/main.cpp $(SRC_DIR)/Reduccion3SATto3DM.cpp $(SRC_DIR)/Utils.cpp $(SRC_DIR)/UI.cpp $(SRC_DIR)/FormulaHandler.cpp $(SRC_DIR)/JsonUtils.cpp
+OBJECTS = $(BIN_DIR)/main.o $(BIN_DIR)/Reduccion3SATto3DM.o $(BIN_DIR)/Utils.o $(BIN_DIR)/UI.o $(BIN_DIR)/FormulaHandler.o $(BIN_DIR)/JsonUtils.o
 
 # Ejecutable
 TARGET = $(BIN_DIR)/3sat-to-3dm
@@ -56,6 +56,12 @@ $(BIN_DIR)/FormulaHandler.o: $(SRC_DIR)/FormulaHandler.cpp $(INCLUDE_DIR)/Formul
 	@mkdir -p $(BIN_DIR)
 	@echo "Compilando FormulaHandler.cpp..."
 	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)/FormulaHandler.cpp -o $(BIN_DIR)/FormulaHandler.o
+
+# Compilar JsonUtils.cpp
+$(BIN_DIR)/JsonUtils.o: $(SRC_DIR)/JsonUtils.cpp $(INCLUDE_DIR)/JsonUtils.h
+	@mkdir -p $(BIN_DIR)
+	@echo "Compilando JsonUtils.cpp..."
+	$(CXX) $(CXXFLAGS) -c $(SRC_DIR)/JsonUtils.cpp -o $(BIN_DIR)/JsonUtils.o
 
 # Compilar con símbolos de depuración
 debug: CXXFLAGS += $(DEBUGFLAGS)

@@ -8,6 +8,7 @@
 #include "FormulaHandler.h"
 #include "Reduccion3SATto3DM.h"
 #include "Utils.h"
+#include "JsonUtils.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -24,8 +25,11 @@ std::vector<std::string> obtenerArchivosData() {
     }
     
     for (const auto& entry : fs::directory_iterator("data")) {
-        if (entry.is_regular_file() && entry.path().extension() == ".txt") {
-            archivos.push_back(entry.path().filename().string());
+        if (entry.is_regular_file()) {
+            std::string ext = entry.path().extension().string();
+            if (ext == ".txt" || ext == ".json") {
+                archivos.push_back(entry.path().filename().string());
+            }
         }
     }
     
@@ -48,6 +52,17 @@ void mostrarFormula(int numVars, const std::vector<Clausula>& formula) {
 }
 
 bool cargarDesdeArchivo(const std::string& filepath, int& numVars, std::vector<Clausula>& formula) {
+    // Detectar si es JSON
+    if (filepath.size() >= 5 && filepath.substr(filepath.size() - 5) == ".json") {
+        auto data = JsonUtils::leerFormulaJson(filepath);
+        if (data.exito) {
+            numVars = data.numVars;
+            formula = data.clausulas;
+            return true;
+        }
+        return false;
+    }
+
     std::ifstream file(filepath);
     
     if (!file.is_open()) {
@@ -194,10 +209,33 @@ void ejecutarReduccion(int numVars, const std::vector<Clausula>& formula, bool d
 }
 
 void guardarResultados(const std::string& filename, int numVars, const std::vector<Clausula>& formula) {
-    std::ofstream file(filename);
+    // Asegurar que existe el directorio out
+    if (!fs::exists("out")) {
+        fs::create_directory("out");
+    }
+    
+    std::string fullPath = "out/" + filename;
+
+    // Si es JSON, usar el formato estructurado
+    if (fullPath.size() >= 5 && fullPath.substr(fullPath.size() - 5) == ".json") {
+        // Silenciar salida durante la generación
+        std::cout.setstate(std::ios_base::failbit);
+        Reduccion3SATto3DM reduccion(numVars, formula);
+        reduccion.generar();
+        std::cout.clear();
+        
+        if (JsonUtils::guardarResultadoJson(fullPath, reduccion.getTripletas())) {
+            std::cout << "✓ Resultados guardados en JSON: " << fullPath << "\n";
+        } else {
+            std::cout << "❌ Error al guardar el archivo JSON.\n";
+        }
+        return;
+    }
+
+    std::ofstream file(fullPath);
     
     if (!file.is_open()) {
-        std::cout << "❌ Error al abrir el archivo " << filename << "\n";
+        std::cout << "❌ Error al abrir el archivo " << fullPath << "\n";
         return;
     }
     
@@ -227,7 +265,7 @@ void guardarResultados(const std::string& filename, int numVars, const std::vect
     std::cout.rdbuf(coutBuf);
     
     file.close();
-    std::cout << "✓ Resultados guardados en: " << filename << "\n";
+    std::cout << "✓ Resultados guardados en: " << fullPath << "\n";
 }
 
 std::string clausulaToString(const Clausula& c) {

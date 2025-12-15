@@ -168,10 +168,17 @@ int main() {
                 std::string filepath = "data/" + archivos[sel - 1];
                 
                 if (cargarDesdeArchivo(filepath, numVars, formula)) {
+                    std::cout << "\nFormato de salida (1: TXT, 2: JSON): ";
+                    int fmt;
+                    std::cin >> fmt;
+                    limpiarBuffer();
+
                     std::cout << "\nNombre del archivo de salida (sin extensión): ";
                     std::string filename;
                     std::getline(std::cin, filename);
-                    filename += ".txt";
+                    
+                    if (fmt == 2) filename += ".json";
+                    else filename += ".txt";
                     
                     guardarResultados(filename, numVars, formula);
                     pausar(1500);
