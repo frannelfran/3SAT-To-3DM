@@ -72,9 +72,12 @@ void mostrarAyuda() {
     std::cout << "   • Negativos: -1=¬p, -2=¬q, -3=¬r, -4=¬s, etc.\n";
     std::cout << "   • Ejemplo: (p ∨ ¬q ∨ r) → 1 -2 3\n\n";
     
-    std::cout << "📁 Formato de archivos data/*.txt:\n";
-    std::cout << "   # Comentario (opcional)\n";
-    std::cout << "   <num_variables> <num_clausulas>\n";
-    std::cout << "   <lit1> <lit2> <lit3>\n";
-    std::cout << "   ...\n";
+    std::cout << "📁 Formato de archivos data/*.json:\n";
+    std::cout << "   {\n";
+    std::cout << "     \"numVars\": <num_variables>,\n";
+    std::cout << "     \"clausulas\": [\n";
+    std::cout << "       [<lit1>, <lit2>, <lit3>],\n";
+    std::cout << "       ...\n";
+    std::cout << "     ]\n";
+    std::cout << "   }\n";
 }

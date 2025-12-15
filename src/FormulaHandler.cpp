@@ -27,7 +27,7 @@ std::vector<std::string> obtenerArchivosData() {
     for (const auto& entry : fs::directory_iterator("data")) {
         if (entry.is_regular_file()) {
             std::string ext = entry.path().extension().string();
-            if (ext == ".txt" || ext == ".json") {
+            if (ext == ".json") {
                 archivos.push_back(entry.path().filename().string());
             }
         }
@@ -60,50 +60,7 @@ bool cargarDesdeArchivo(const std::string& filepath, int& numVars, std::vector<C
             formula = data.clausulas;
             return true;
         }
-        return false;
     }
-
-    std::ifstream file(filepath);
-    
-    if (!file.is_open()) {
-        return false;
-    }
-    
-    formula.clear();
-    std::string linea;
-    
-    // Leer hasta encontrar la línea con numVars y numClausulas
-    while (std::getline(file, linea)) {
-        if (linea.empty() || linea[0] == '#') {
-            continue;
-        }
-        
-        std::istringstream iss(linea);
-        int numClausulas;
-        if (iss >> numVars >> numClausulas) {
-            // Leer las cláusulas
-            for (int i = 0; i < numClausulas; ++i) {
-                if (!std::getline(file, linea)) {
-                    return false;
-                }
-                
-                if (linea.empty() || linea[0] == '#') {
-                    --i;
-                    continue;
-                }
-                
-                std::istringstream clausula_stream(linea);
-                int l1, l2, l3;
-                if (clausula_stream >> l1 >> l2 >> l3) {
-                    formula.push_back({l1, l2, l3});
-                } else {
-                    return false;
-                }
-            }
-            return true;
-        }
-    }
-    
     return false;
 }
 
@@ -216,56 +173,17 @@ void guardarResultados(const std::string& filename, int numVars, const std::vect
     
     std::string fullPath = "out/" + filename;
 
-    // Si es JSON, usar el formato estructurado
-    if (fullPath.size() >= 5 && fullPath.substr(fullPath.size() - 5) == ".json") {
-        // Silenciar salida durante la generación
-        std::cout.setstate(std::ios_base::failbit);
-        Reduccion3SATto3DM reduccion(numVars, formula);
-        reduccion.generar();
-        std::cout.clear();
-        
-        if (JsonUtils::guardarResultadoJson(fullPath, reduccion.getTripletas())) {
-            std::cout << "✓ Resultados guardados en JSON: " << fullPath << "\n";
-        } else {
-            std::cout << "❌ Error al guardar el archivo JSON.\n";
-        }
-        return;
-    }
-
-    std::ofstream file(fullPath);
-    
-    if (!file.is_open()) {
-        std::cout << "❌ Error al abrir el archivo " << fullPath << "\n";
-        return;
-    }
-    
-    file << "========================================\n";
-    file << "  REDUCCIÓN 3SAT → 3DM\n";
-    file << "========================================\n\n";
-    
-    file << "FÓRMULA 3SAT:\n";
-    file << "Variables: " << numVars << "\n";
-    file << "Cláusulas: " << formula.size() << "\n\n";
-    
-    for (size_t i = 0; i < formula.size(); ++i) {
-        file << "C" << (i + 1) << ": " << clausulaToString(formula[i]) << "\n";
-    }
-    
-    file << "\n" << std::string(40, '-') << "\n\n";
-    
-    // Redirigir cout al archivo temporalmente
-    std::streambuf* coutBuf = std::cout.rdbuf();
-    std::cout.rdbuf(file.rdbuf());
-    
+    // Silenciar salida durante la generación
+    std::cout.setstate(std::ios_base::failbit);
     Reduccion3SATto3DM reduccion(numVars, formula);
     reduccion.generar();
-    reduccion.imprimirResultados();
+    std::cout.clear();
     
-    // Restaurar cout
-    std::cout.rdbuf(coutBuf);
-    
-    file.close();
-    std::cout << "✓ Resultados guardados en: " << fullPath << "\n";
+    if (JsonUtils::guardarResultadoJson(fullPath, reduccion.getTripletas())) {
+        std::cout << "✓ Resultados guardados en JSON: " << fullPath << "\n";
+    } else {
+        std::cout << "❌ Error al guardar el archivo JSON.\n";
+    }
 }
 
 std::string clausulaToString(const Clausula& c) {
