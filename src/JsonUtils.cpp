@@ -74,11 +74,13 @@ JsonUtils::FormulaData JsonUtils::leerFormulaJson(const std::string& filepath) {
     return data;
 }
 
-bool JsonUtils::guardarResultadoJson(const std::string& filepath, const std::vector<Tripleta>& tripletas) {
+bool JsonUtils::guardarResultadoJson(const std::string& filepath, const std::vector<Tripleta>& tripletas, int targetMatching) {
     std::ofstream file(filepath);
     if (!file.is_open()) return false;
 
     file << "{\n";
+    file << "  \"totalTriplets\": " << tripletas.size() << ",\n";
+    file << "  \"targetMatchingSize\": " << targetMatching << ",\n";
     file << "  \"triplets\": [\n";
 
     for (size_t i = 0; i < tripletas.size(); ++i) {

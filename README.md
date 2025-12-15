@@ -12,7 +12,7 @@ Esta reducción es fundamental en la teoría de la complejidad computacional y f
 - 📂 **Carga de modelos** desde archivos en carpeta `data/`
 - ✏️ **Entrada manual** de fórmulas 3SAT con validación
 - 👁️ **Modos de visualización**: detallado o resumen
-- 💾 **Exportar resultados** a archivos de texto
+- 💾 **Exportar resultados** a archivos JSON
 - 🎨 **Animaciones y diseño** atractivo
 - 🧪 **Tests automáticos** incluidos
 
@@ -28,9 +28,8 @@ Esta reducción es fundamental en la teoría de la complejidad computacional y f
 │   ├── Clausula.h                # Estructura de cláusulas 3SAT
 │   └── Reduccion3SATto3DM.h      # Clase principal de reducción
 ├── data/                         # Modelos predefinidos
-│   ├── ejemplo1.txt              # Ejemplo simple
-│   ├── ejemplo2.txt              # Ejemplo medio
-│   └── ejemplo3.txt              # Ejemplo complejo
+│   ├── ejemplo_json.json         # Ejemplo simple
+│   └── ejemplo_complejo.json     # Ejemplo complejo
 ├── bin/                          # Binarios y archivos objeto (generados)
 ├── Makefile                      # Sistema de compilación
 └── README.md                     # Este archivo
@@ -94,30 +93,54 @@ El programa ofrece un **menú interactivo visual** con las siguientes opciones:
 3. **💾 Guardar Resultados**: 
    - Selecciona un modelo predefinido
    - Exporta la reducción a archivo .txt
-
+json
 4. **❓ Ayuda**: 
    - Explicación de conceptos clave
    - Guía de notación y formato de archivos
 
-### Formato de Archivos (data/*.txt)
+### Formato de Archivos (data/*.json)
 
-```
-# Comentarios opcionales
-<numero_variables> <numero_clausulas>
-<lit1> <lit2> <lit3>
-<lit1> <lit2> <lit3>
-...
+```json
+{
+  "numVars": <numero_variables>,
+  "clausulas": [
+    [<lit1>, <lit2>, <lit3>],
+    [<lit1>, <lit2>, <lit3>],
+    ...
+  ]
+}
 ```
 
-**Ejemplo** (`data/ejemplo1.txt`):
-```
-# Ejemplo simple
-3 2
-1 -2 -3
--1 -2 3
+**Ejemplo** (`data/ejemplo_json.json`):
+```json
+{
+  "numVars": 3,
+  "clausulas": [
+    [1, -2, -3],
+    [-1, -2, 3]
+  ]
+}
 ```
 
 Esto representa: (p ∨ ¬q ∨ ¬r) ∧ (¬p ∨ ¬q ∨ r)
+
+### Formato de Salida (out/*.json)
+
+```json
+{
+  "totalTriplets": <total_tripletas>,
+  "targetMatchingSize": <tamano_matching_objetivo>,
+  "triplets": [
+    {
+      "w": "<elemento_w>",
+      "x": "<elemento_x>",
+      "y": "<elemento_y>",
+      "type": "<tipo_tripleta>"
+    },
+    ...
+  ]
+}
+```
 
 ## 📚 Componentes de la Reducción
 

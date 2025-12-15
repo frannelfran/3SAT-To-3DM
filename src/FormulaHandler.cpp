@@ -179,7 +179,8 @@ void guardarResultados(const std::string& filename, int numVars, const std::vect
     reduccion.generar();
     std::cout.clear();
     
-    if (JsonUtils::guardarResultadoJson(fullPath, reduccion.getTripletas())) {
+    int targetMatching = 2 * numVars * (int)formula.size();
+    if (JsonUtils::guardarResultadoJson(fullPath, reduccion.getTripletas(), targetMatching)) {
         std::cout << "✓ Resultados guardados en JSON: " << fullPath << "\n";
     } else {
         std::cout << "❌ Error al guardar el archivo JSON.\n";

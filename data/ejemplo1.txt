@@ -1,5 +1,0 @@
-# Ejemplo Simple
-# (p v -q v -r) ^ (-p v -q v r)
-3 2
-1 -2 -3
--1 -2 3

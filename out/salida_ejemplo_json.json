@@ -1,4 +1,6 @@
 {
+  "totalTriplets": 66,
+  "targetMatchingSize": 12,
   "triplets": [
     {
       "w": "w_neg_a_1",

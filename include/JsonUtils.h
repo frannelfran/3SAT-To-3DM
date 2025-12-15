@@ -21,7 +21,7 @@ public:
 
     // Escribe el resultado en JSON con el formato:
     // { "triplets": [ { "w": "...", "x": "...", "y": "...", "type": "..." }, ... ] }
-    static bool guardarResultadoJson(const std::string& filepath, const std::vector<Tripleta>& tripletas);
+    static bool guardarResultadoJson(const std::string& filepath, const std::vector<Tripleta>& tripletas, int targetMatching);
 };
 
 #endif // JSON_UTILS_H
