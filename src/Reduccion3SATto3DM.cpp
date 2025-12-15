@@ -40,9 +40,8 @@ void Reduccion3SATto3DM::imprimirResultados() const {
     }
     std::cout << "\nTotal de Tripletas: " << M.size() << "\n";
     
-    // Cardinalidad esperada para un matching perfecto q = 2*n*m
-    // n*m (variables) + m (cláusulas) + m*(n-1) (garbage) = 2*n*m
-    std::cout << "Matching Perfecto objetivo requiere seleccionar " << 2 * m * n << " tripletas.\n"; 
+    // Cardinalidad esperada para un matching perfecto q = n*m
+    std::cout << "Matching Perfecto objetivo requiere seleccionar " << m * n << " tripletas.\n"; 
 }
 
 void Reduccion3SATto3DM::generarComponentesVariables() {
